@@ -1,12 +1,12 @@
 import React, { useCallback, useState } from 'react'
-import { View, StyleSheet, ViewStyle, FlatList } from 'react-native'
+import { View, StyleSheet, ViewStyle, FlatList, Text } from 'react-native'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { filter, find, map, uniq } from 'lodash'
-import * as ItemsList from '~/mocks/items.json'
+import { useQuery, gql } from '@apollo/client'
 import FilterMenu from '~/components/menu/FilterMenu'
 import Card from '~/components/Item/Card'
 import { Colors } from '~/helpers/Colors'
-import { Item } from '~/models/Item'
+import { Item, ItemList } from '~/models/Item'
 
 type DashboardScreenProps = NativeStackScreenProps<
   {
@@ -17,25 +17,48 @@ type DashboardScreenProps = NativeStackScreenProps<
 >
 
 const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
-  const [data, setData] = useState(ItemsList.data.items)
+  const { data, loading, refetch } = useQuery<ItemList>(gql`
+    {
+      items {
+        id
+        title
+        image
+        category {
+          id
+          title
+        }
+        author
+      }
+    }
+  `)
 
-  const categories = uniq(map(ItemsList.data.items, items => items.category.title))
+  const [filtered, setFiltered] = useState<any>()
+
+  const categories = uniq(map(data?.items, item => item.category.title))
   categories.unshift('All')
 
   const handleItemPress = useCallback(
     id => {
-      const itemFiltered: Item | undefined = find(ItemsList.data.items, { id })
+      const itemFiltered: Item | undefined = find(data?.items, { id })
       navigation.navigate('ItemScreen', { item: itemFiltered })
     },
-    [navigation]
+    [navigation, data]
   )
 
   const handleItemMenuPress = (category: string) => {
     if (category === 'All') {
-      setData(ItemsList.data.items)
+      refetch()
     } else {
-      setData(filter(ItemsList.data.items, { category: { title: category } }))
+      setFiltered(filter(data?.items, { category: { title: category } }))
     }
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Cargando...</Text>
+      </View>
+    )
   }
 
   return (
@@ -45,7 +68,7 @@ const DashboardScreen = ({ navigation }: DashboardScreenProps) => {
       </View>
       <View style={styles.body}>
         <FlatList
-          data={data}
+          data={filtered || data?.items}
           numColumns={2}
           keyExtractor={item => item.id}
           scrollEventThrottle={16}

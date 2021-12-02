@@ -11,5 +11,5 @@ export type Item = {
 }
 
 export type ItemList = {
-  list: Item[]
+  items: Item[]
 }
