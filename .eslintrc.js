@@ -1,4 +1,90 @@
+const path = require('path')
+
 module.exports = {
   root: true,
-  extends: '@react-native-community',
-};
+  extends: ['airbnb', '@react-native-community', 'prettier', 'plugin:prettier/recommended'],
+  plugins: ['react', 'react-native', 'babel', 'prettier'],
+  env: {
+    browser: true,
+    node: true,
+  },
+  globals: {
+    Promise: true,
+  },
+  parser: 'babel-eslint',
+  rules: {
+    'global-require': 'off',
+    'import/export': 'off',
+    'jsx-a11y/accessible-emoji': 'off',
+    'react/destructuring-assignment': ['off', 'always'],
+    'react/jsx-filename-extension': 'off',
+    'react/jsx-uses-react': 'error',
+    'react/jsx-uses-vars': 'error',
+    'react/function-component-definition': [2, { namedComponents: 'arrow-function' }],
+    'react/prop-types': 'error',
+    'react/react-in-jsx-scope': 'error',
+    'react-native/no-unused-styles': 'error',
+    'react-native/no-inline-styles': 'error',
+    'react-native/no-color-literals': 'error',
+    'react/jsx-curly-brace-presence': 'off',
+    'babel/new-cap': 'warn',
+    curly: ['error', 'all'],
+    'import/no-extraneous-dependencies': 'off',
+    'import/prefer-default-export': 'off',
+    'no-console': 'error',
+    'no-use-before-define': 'off',
+    'one-var': ['error', { uninitialized: 'always', initialized: 'never' }],
+    'object-curly-newline': 'off',
+    'operator-linebreak': 'off',
+    'one-var-declaration-per-line': 'off',
+    'prefer-destructuring': ['off', { object: true, array: false }],
+    'padding-line-between-statements': [
+      'error',
+      { blankLine: 'always', prev: '*', next: 'return' },
+      { blankLine: 'always', prev: '*', next: 'function' },
+    ],
+    'spaced-comment': ['error', 'always'],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        jsx: 'never',
+        ts: 'never',
+        tsx: 'never',
+        mjs: 'never',
+      },
+    ],
+  },
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [['~', path.resolve(__dirname, './src')]],
+        extensions: [
+          '.js',
+          '.ios.js',
+          '.android.js',
+          '.ts',
+          '.ios.ts',
+          '.android.ts',
+          '.tsx',
+          '.ios.tsx',
+          '.android.tsx',
+          '.json',
+        ],
+      },
+    },
+  },
+  overrides: [
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        ecmaVersion: 2018,
+        sourceType: 'module',
+      },
+      settings: { react: { version: 'detect' } },
+    },
+  ],
+}
